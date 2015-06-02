@@ -27,6 +27,9 @@ class Pool(object):
     
     def available(self):
         return self.__available
+    
+    def size(self):
+        return self.__n
 
 tests = []   
         
@@ -49,7 +52,22 @@ def t2():
         assert False
     except ValueError:
         pass
+    try:
+        p.free_id(p.size()+1)
+        assert False
+    except ValueError:
+        pass
+    
 tests.append(t2)
+
+def t3():
+    n = 256
+    p = Pool(n)
+    for i in xrange(1,n+1):
+        assert p.get_id()==i 
+    assert p.available()==0
+    
+
 if __name__=="__main__":
     for t in tests:
         t()
