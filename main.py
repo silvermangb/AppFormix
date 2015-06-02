@@ -5,6 +5,12 @@ Created on Jun 2, 2015
 '''
 
 class Pool(object):
+    '''
+    a pool of integer ids, 1 through self.__n, represented
+    as a list of the integers, 1 through self.__n.
+    
+    when an id is taken its slot in the array is set to 0.
+    '''
     
     def __init__(self,n):
         self.__n = n
@@ -13,6 +19,13 @@ class Pool(object):
         self.__index = 0
         
     def get_id(self):
+        '''
+        if the pool is not empty, find the next
+        non-zero list entry and return that value.
+        
+        if the list is empty, return 0, which is not a
+        valid id.
+        '''
         if self.available():
             self.__available -= 1
             while self.__pool[self.__index]==0:
@@ -29,6 +42,13 @@ class Pool(object):
             return 0
         
     def free_id(self,anId):
+        '''
+        for a valid id, put it in its slot, otherwise, raise an exception.
+        
+        Note: freeing an id that was not taken could be considered an exceptional
+        condition, but, is not at this time.
+        
+        '''
         if anId<1 or anId>self.__n:
             raise ValueError(str(anId)+" is an invalid id")
         else:
@@ -41,15 +61,26 @@ class Pool(object):
     def size(self):
         return self.__n
 
+
+'''
+create a list of unit tests
+'''
 tests = []   
         
 def t1():
+    '''
+    simplest test, an empty pool returns 0
+    '''
     p = Pool(0);
     assert p.get_id()==0
     
 tests.append(t1)
 
 def t2():
+    '''
+    tests of getting and freeing from a size 1 pool, and,
+    freeing invalid values.
+    '''
     p = Pool(1)
     assert p.get_id()==1
     assert p.get_id()==0
@@ -70,6 +101,9 @@ def t2():
     
 tests.append(t2)
 
+'''
+a "stress" test :)
+'''
 def t3():
     n = 256
     p = Pool(n)
@@ -85,7 +119,7 @@ test that ids can be freed in any order.
 1. remove all odd ids
 2. verify only even ids are left
 3. free odd ids in reverse order
-
+4. verify odd ids are there
 '''
 def t4():
     p = Pool(8)
@@ -109,5 +143,6 @@ def t4():
 tests.append(t4)    
 
 if __name__=="__main__":
+    #run the regression tests
     for t in tests:
         t()
