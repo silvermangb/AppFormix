@@ -6,6 +6,8 @@ Created on Jun 2, 2015
 get_id: requesting an id from an empty pool is not considered an error. 0 is
 returned, since 0 is not a valid id the client can test if a valid id was returned.
 
+ids are returned in integer order, modulo n. 
+
 free_id: 
 
 freeing an invalid id value is an exception, clients can query the object for the
@@ -27,6 +29,7 @@ class Pool(object):
     as a list of the integers, 1 through self.__n.
     
     when an id is taken its slot in the array is set to 0.
+    
     '''
     
     def __init__(self,n):
