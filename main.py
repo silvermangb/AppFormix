@@ -9,12 +9,22 @@ class Pool(object):
     def __init__(self,n):
         self.__n = n
         self.__available = n
-        self.pool = set([i for i in xrange(1,n+1)])
+        self.__pool = [i for i in xrange(1,n+1)]
+        self.__index = 0
         
     def get_id(self):
-        if self.pool:
+        if self.available():
             self.__available -= 1
-            return self.pool.pop()
+            while self.__pool[self.__index]==0:
+                self.__index += 1
+                if self.__index==self.__n:
+                    self.__index = 0
+            v = self.__pool[self.__index]
+            self.__pool[self.__index] = 0
+            self.__index += 1
+            if self.__index==self.__n:
+                self.__index = 0
+            return v
         else:
             return 0
         
@@ -23,7 +33,7 @@ class Pool(object):
             raise ValueError(str(anId)+" is an invalid id")
         else:
             self.__available += 1
-            self.pool.add(anId)
+            self.__pool[anId-1] = anId
     
     def available(self):
         return self.__available
@@ -66,7 +76,37 @@ def t3():
     for i in xrange(1,n+1):
         assert p.get_id()==i 
     assert p.available()==0
+
+tests.append(t3)
+
+'''
+test that ids can be freed in any order.
+
+1. remove all odd ids
+2. verify only even ids are left
+3. free odd ids in reverse order
+
+'''
+def t4():
+    p = Pool(8)
+    for i in xrange(p.size()):
+        anId = p.get_id()
+        if anId%2==0:
+            p.free_id(anId)
+    assert p.available()==p.size()/2
+    for i in xrange(p.size()):
+        anId = p.get_id()
+        if i<=p.size()/2:
+            assert anId%2==0
+        else:
+            assert anId==0
+    for i in xrange(p.size()-1,0,-2):
+        p.free_id(i)
+        
+    for i in xrange(p.size(),2):
+        assert p.get_id()==i+1
     
+tests.append(t4)    
 
 if __name__=="__main__":
     for t in tests:
