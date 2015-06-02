@@ -2,6 +2,23 @@
 Created on Jun 2, 2015
 
 @author: Greg Silverman
+
+get_id: requesting an id from an empty pool is not considered an error. 0 is
+returned, since 0 is not a valid id the client can test if a valid id was returned.
+
+free_id: 
+
+freeing an invalid id value is an exception, clients can query the object for the
+valid range of ids, i.e., 1 through pool.size().
+
+freeing an id that is available in the pool is not treated as an error or exception, although
+it could be.
+
+data structure:
+
+a list of integers 1 through n. a value of i at index i indicates i is an available id, 0
+indicates it is taken.
+
 '''
 
 class Pool(object):
