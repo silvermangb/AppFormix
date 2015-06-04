@@ -164,5 +164,11 @@ tests.append(t4)
 
 if __name__=="__main__":
     #run the regression tests
-    for t in tests:
-        t()
+    failureCount = 0
+    try:
+        for t in tests:
+            t()
+    except Exception as e:
+        print e
+        failureCount += 1
+    print len(tests)-failureCount,'successes',failureCount,'failures'
