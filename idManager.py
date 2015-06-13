@@ -32,17 +32,14 @@ class Pool(object):
     as a list of the integers, 1 through self.__n.
     
     when an id is taken its slot in the array is set to 0.
-    
     '''
     
     def __init__(self,n):
         self.__n = n
         self.__available = n
-        self.__pool = [i for i in xrange(1,n+1)]
+        self.__pool  = [i for i in xrange(1,n+1)]
         self.__stack = [i for i in xrange(1,n+1)]
         self.__stackPointer = n-1
-        print self.__stackPointer
-        print self.__stack
 
         
     def get_id(self):
@@ -56,7 +53,6 @@ class Pool(object):
         if self.__available>0:
             self.__available -= 1
             anId = self.__stack[self.__stackPointer]
-            self.__stack[self.__stackPointer] = 0
             self.__stackPointer -= 1
             self.__pool[anId-1]= 0
             return anId
@@ -108,7 +104,6 @@ def t2():
     freeing invalid values.
     '''
     p = Pool(1)
-    print 'p.size()=',p.size()
     assert p.get_id()==p.size()
     assert p.get_id()==0
     p.free_id(1)
@@ -175,9 +170,6 @@ tests.append(t4)
 
 
 if __name__=="__main__":
-    for t in tests:
-        print t
-        t()
     #run the regression tests
     failureCount = 0
     try:
