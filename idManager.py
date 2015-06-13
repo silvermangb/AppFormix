@@ -3,6 +3,9 @@ Created on Jun 2, 2015
 
 @author: Greg Silverman
 
+
+@attention: ***Comments need updating, now using a stack of available ids***
+
 get_id: requesting an id from an empty pool is not considered an error. 0 is
 returned, since 0 is not a valid id the client can test if a valid id was returned.
 
@@ -36,7 +39,11 @@ class Pool(object):
         self.__n = n
         self.__available = n
         self.__pool = [i for i in xrange(1,n+1)]
-        self.__index = 0
+        self.__stack = [i for i in xrange(1,n+1)]
+        self.__stackPointer = n-1
+        print self.__stackPointer
+        print self.__stack
+
         
     def get_id(self):
         '''
@@ -46,18 +53,13 @@ class Pool(object):
         if the list is empty, return 0, which is not a
         valid id.
         '''
-        if self.available():
+        if self.__available>0:
             self.__available -= 1
-            while self.__pool[self.__index]==0:
-                self.__index += 1
-                if self.__index==self.__n:
-                    self.__index = 0
-            v = self.__pool[self.__index]
-            self.__pool[self.__index] = 0
-            self.__index += 1
-            if self.__index==self.__n:
-                self.__index = 0
-            return v
+            anId = self.__stack[self.__stackPointer]
+            self.__stack[self.__stackPointer] = 0
+            self.__stackPointer -= 1
+            self.__pool[anId-1]= 0
+            return anId
         else:
             return 0
         
@@ -72,8 +74,12 @@ class Pool(object):
         if anId<1 or anId>self.__n:
             raise ValueError(str(anId)+" is an invalid id")
         else:
-            self.__available += 1
+            if self.__pool[anId-1]!=0:
+                raise Exception("double delete")
             self.__pool[anId-1] = anId
+            self.__stackPointer += 1
+            self.__stack[self.__stackPointer] = anId
+            self.__available += 1
     
     def available(self):
         return self.__available
@@ -102,7 +108,8 @@ def t2():
     freeing invalid values.
     '''
     p = Pool(1)
-    assert p.get_id()==1
+    print 'p.size()=',p.size()
+    assert p.get_id()==p.size()
     assert p.get_id()==0
     p.free_id(1)
     assert p.available()==1
@@ -128,7 +135,8 @@ def t3():
     n = 256
     p = Pool(n)
     for i in xrange(1,n+1):
-        assert p.get_id()==i 
+        j = p.get_id()
+        assert j==(n-i+1),str(n-i+1)+','+str(j)
     assert p.available()==0
 
 tests.append(t3)
@@ -143,10 +151,13 @@ test that ids can be freed in any order.
 '''
 def t4():
     p = Pool(8)
+    taken = []
     for i in xrange(p.size()):
         anId = p.get_id()
         if anId%2==0:
-            p.free_id(anId)
+            taken.append(anId)
+    for anId in taken:
+        p.free_id(anId)
     assert p.available()==p.size()/2
     for i in xrange(p.size()):
         anId = p.get_id()
@@ -162,11 +173,16 @@ def t4():
     
 tests.append(t4)    
 
+
 if __name__=="__main__":
+    for t in tests:
+        print t
+        t()
     #run the regression tests
     failureCount = 0
     try:
         for t in tests:
+            print t
             t()
     except Exception as e:
         print e
