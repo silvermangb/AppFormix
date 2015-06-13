@@ -8,30 +8,31 @@ Created on Jun 2, 2015
 
 get_id: requesting an id from an empty pool is not considered an error. 0 is
 returned, since 0 is not a valid id the client can test if a valid id was returned.
-
-ids are returned in integer order, modulo n. 
+ 
 
 free_id: 
 
 freeing an invalid id value is an exception, clients can query the object for the
 valid range of ids, i.e., 1 through pool.size().
 
-freeing an id that is available in the pool is not treated as an error or exception, although
-it could be.
+freeing an id that is available in the pool is a "double delete" exception.
+
 
 data structure:
 
 a list of integers 1 through n. a value of i at index i indicates i is an available id, 0
 indicates it is taken.
 
+a stack of integers. get_id pops the stack to return an id. free_id pushes id onto stack.
+
 '''
 
 class Pool(object):
     '''
     a pool of integer ids, 1 through self.__n, represented
-    as a list of the integers, 1 through self.__n.
+    as a list of the integers, 1 through self.__n and a stack.
     
-    when an id is taken its slot in the array is set to 0.
+    when an id is taken it is popped off the stack and its slot in the array is set to 0.
     '''
     
     def __init__(self,n):
@@ -44,10 +45,11 @@ class Pool(object):
         
     def get_id(self):
         '''
-        if the pool is not empty, find the next
-        non-zero list entry and return that value.
+        if the pool is not empty, pop an id off of the stack and
+        set its position in self.__pool to zero to indicate it is
+        taken.
         
-        if the list is empty, return 0, which is not a
+        if all ids are taken, return 0, which is not a
         valid id.
         '''
         if self.__available>0:
@@ -61,11 +63,7 @@ class Pool(object):
         
     def free_id(self,anId):
         '''
-        for a valid id, put it in its slot, otherwise, raise an exception.
-        
-        Note: freeing an id that was not taken could be considered an exceptional
-        condition, but, is not at this time.
-        
+        for a valid id, put it in its slot and push it on the stack, otherwise, raise an exception.
         '''
         if anId<1 or anId>self.__n:
             raise ValueError(str(anId)+" is an invalid id")
