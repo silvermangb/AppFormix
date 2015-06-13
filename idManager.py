@@ -4,8 +4,7 @@ Created on Jun 2, 2015
 @author: Greg Silverman
 
 
-@attention: ***Comments need updating, now using a stack of available ids***
-
+@note: APIs:
 get_id: requesting an id from an empty pool is not considered an error. 0 is
 returned, since 0 is not a valid id the client can test if a valid id was returned.
  
@@ -18,12 +17,18 @@ valid range of ids, i.e., 1 through pool.size().
 freeing an id that is available in the pool is a "double delete" exception.
 
 
-data structure:
+@note: data structures:
 
 a list of integers 1 through n. a value of i at index i indicates i is an available id, 0
 indicates it is taken.
 
 a stack of integers. get_id pops the stack to return an id. free_id pushes id onto stack.
+
+@note: performance
+
+time: O(1) to get an id and O(1) to free an id.
+space: 2*n integers.
+
 
 '''
 
